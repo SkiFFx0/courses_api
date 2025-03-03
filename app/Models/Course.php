@@ -27,9 +27,9 @@ class Course extends Model
         return $this->belongsToMany(User::class, 'course_user', 'course_id', 'user_id');
     }
 
-    public function submissions()
+    public function tasks()
     {
-        return $this->hasMany(Submission::class, 'course_id', 'id');
+        return $this->hasMany(Task::class, 'course_id', 'id');
     }
 
     public function comments()

@@ -12,7 +12,7 @@ class Submission extends Model
     protected $table = 'submissions';
 
     protected $fillable = [
-        'course_id',
+        'task_id',
         'user_id',
         'file_path',
         'grade',
@@ -20,16 +20,21 @@ class Submission extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id', 'id');
+        return $this->belongsTo(User::class, 'student_id', 'id');
     }
 
-    public function courses()
+    public function tasks()
     {
-        return $this->belongsTo(Course::class, 'course_id', 'id');
+        return $this->belongsTo(Task::class, 'task_id', 'id');
     }
 
     public function comments()
     {
         return $this->morphMany(Comment::class, 'commentable');
+    }
+
+    public function files()
+    {
+        return $this->morphMany(File::class, 'fileable');
     }
 }
