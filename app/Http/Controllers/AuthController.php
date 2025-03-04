@@ -12,28 +12,28 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $registerUserData = $request->validate([
-            'first_name' => 'required|string',
-            'last_name' => 'required|string',
-            'middle_name' => 'nullable|string',
-            'username' => 'nullable|max:255|unique:users|required_without_all:email,phone',
-            'email' => 'nullable|string|email|max:255|unique:users|required_without_all:username,phone',
-            'phone' => 'nullable|integer|max:10|unique:users|required_without_all:username,email',
-            'role' => 'nullable|string|in:student,teacher',
-            'password' => 'required|string|min:8',
+            'first_name' => ["required", "string"],
+            'last_name' => ["required", "string"],
+            'middle_name' => ["nullable", "string"],
+            'username' => ["nullable", "max:255", "unique:users,username", "required_without_all:email,phone"],
+            'email' => ["nullable", "string", "email", "max:255", "unique:users,email", "required_without_all:username,phone"],
+            'phone' => ["nullable", "string", "regex:/^\+?\d{1,14}$/", "unique:users,phone", "required_without_all:username,email"],
+            'role' => ["nullable", "string", "in:student,teacher"],
+            'password' => ["required", "string", "min:8"],
         ]);
 
         User::query()->create($registerUserData);
 
         return response()->json([
             'message' => 'User successfully registered'
-        ], 201);
+        ]);
     }
 
     public function login(Request $request)
     {
         $request->validate([
-            'login' => 'required|string',
-            'password' => 'required|string|min:8',
+            'login' => ["required", "string"],
+            'password' => ["required", "string", "min:8"],
         ]);
 
         $loginValue = ltrim($request->login, "+");
@@ -46,7 +46,7 @@ class AuthController extends Controller
         {
             return response()->json([
                 'message' => 'Invalid credentials'
-            ], 401);
+            ]);
         }
 
         $token = $user->createToken('auth_token')->plainTextToken;
@@ -58,7 +58,8 @@ class AuthController extends Controller
         ]);
     }
 
-    public function logout(Request $request){
+    public function logout(Request $request)
+    {
         $request->user()->tokens()->delete();
 
         return response()->json([
