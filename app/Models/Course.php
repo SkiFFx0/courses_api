@@ -14,6 +14,7 @@ class Course extends Model
     protected $fillable = [
         'title',
         'description',
+        'teacher_id',
     ];
 
     public function teacher()
@@ -21,7 +22,7 @@ class Course extends Model
         return $this->belongsTo(User::class, 'teacher_id', 'id');
     }
 
-    public function users()
+    public function students()
     {
         return $this->belongsToMany(User::class, 'course_user', 'course_id', 'user_id');
     }

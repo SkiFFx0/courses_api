@@ -8,11 +8,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, SoftDeletes, HasApiTokens;
+    use HasFactory, Notifiable, SoftDeletes, HasApiTokens, HasRoles;
 
     protected $table = 'users';
 
@@ -28,7 +29,6 @@ class User extends Authenticatable
         'username',
         'email',
         'phone',
-        'role',
         'password',
     ];
 
@@ -55,12 +55,12 @@ class User extends Authenticatable
         ];
     }
 
-    public function teacher()
+    public function courses()
     {
         return $this->hasMany(Course::class, 'teacher_id', 'id');
     }
 
-    public function courses()
+    public function enrollments()
     {
         return $this->belongsToMany(Course::class, 'course_user', 'user_id', 'course_id');
     }

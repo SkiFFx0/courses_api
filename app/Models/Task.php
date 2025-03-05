@@ -13,8 +13,8 @@ class Task extends Model
 
     protected $fillable = [
         'title',
-        'course_id',
         'content',
+        'course_id',
     ];
 
     public function submissions()

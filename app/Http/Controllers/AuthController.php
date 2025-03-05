@@ -18,11 +18,11 @@ class AuthController extends Controller
             'username' => ["nullable", "max:255", "unique:users,username", "required_without_all:email,phone"],
             'email' => ["nullable", "string", "email", "max:255", "unique:users,email", "required_without_all:username,phone"],
             'phone' => ["nullable", "string", "regex:/^\+?\d{1,14}$/", "unique:users,phone", "required_without_all:username,email"],
-            'role' => ["nullable", "string", "in:student,teacher"],
             'password' => ["required", "string", "min:8"],
         ]);
 
-        User::query()->create($registerUserData);
+        $user = User::query()->create($registerUserData);
+        $user->assignRole('guest');
 
         return response()->json([
             'message' => 'User successfully registered'

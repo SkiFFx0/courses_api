@@ -50,4 +50,13 @@ class UserController extends Controller
             'message' => 'User password successfully updated'
         ]);
     }
+
+    public function destroy(Request $request)
+    {
+        $request->user()->delete();
+
+        return response()->json([
+            'message' => 'User successfully deleted'
+        ]);
+    }
 }
