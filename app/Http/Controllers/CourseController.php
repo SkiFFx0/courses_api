@@ -3,15 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Models\Course;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
 class CourseController extends Controller
 {
+    use AuthorizesRequests;
+
     public function store(Request $request)
     {
         $courseData = $request->validate([
-            'title' => ["required", "string", "max:255"],
+            'title' => ["required", "string", "max:255", "unique:courses,title"],
             'description' => ["required", "string", "max:255"],
         ]);
 
@@ -26,6 +29,8 @@ class CourseController extends Controller
 
     public function update(Request $request, Course $course)
     {
+        $this->authorize('checkOwnership', $course);
+
         $courseData = $request->validate([
             'title' => ["nullable", "string", "max:255", Rule::unique('courses')->ignore($course->id)],
             'description' => ["nullable", "string", "max:255"],
@@ -40,6 +45,8 @@ class CourseController extends Controller
 
     public function destroy(Course $course)
     {
+        $this->authorize('checkOwnership', $course);
+
         $course->delete();
 
         return response()->json([

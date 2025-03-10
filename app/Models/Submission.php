@@ -13,7 +13,7 @@ class Submission extends Model
 
     protected $fillable = [
         'task_id',
-        'user_id',
+        'student_id',
         'file_path',
         'grade',
     ];

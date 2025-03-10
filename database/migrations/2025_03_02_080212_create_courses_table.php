@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -17,7 +18,7 @@ return new class extends Migration
             $table->string('title');
             $table->text('description');
             $table->foreignId('teacher_id')->nullable()->constrained('users')->nullOnDelete()->cascadeOnUpdate();
-            $table->softDeletes();
+            $table->SoftDeletes();
             $table->timestamps();
         });
     }

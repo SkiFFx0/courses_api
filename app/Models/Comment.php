@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use mysql_xdevapi\Table;
 
 class Comment extends Model
 {
@@ -13,8 +12,10 @@ class Comment extends Model
     protected $table = 'comments';
 
     protected $fillable = [
-        'user_id',
         'content',
+        'user_id',
+        'commentable_id',
+        'commentable_type',
     ];
 
     public function user()

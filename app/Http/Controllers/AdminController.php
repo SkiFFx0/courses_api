@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Course;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
@@ -16,7 +17,8 @@ class AdminController extends Controller
 
         $role = $request->input('role');
 
-        if (!Role::query()->where('name', $role)->exists()) {
+        if (!Role::query()->where('name', $role)->exists())
+        {
             return response()->json([
                 'message' => 'Role does not exist'
             ], 422);
@@ -29,9 +31,10 @@ class AdminController extends Controller
         ]);
     }
 
-    public function destroy(User $user)
+    public function destroyUser(User $user)
     {
-        if (auth()->user()->id === $user->id) {
+        if (auth()->user()->id === $user->id)
+        {
             return response()->json([
                 'message' => 'You cannot delete yourself'
             ], 403);
@@ -41,6 +44,15 @@ class AdminController extends Controller
 
         return response()->json([
             'message' => 'User successfully deleted'
+        ]);
+    }
+
+    public function destroyCourse(Course $course)
+    {
+        $course->delete();
+
+        return response()->json([
+            'message' => 'Course successfully deleted'
         ]);
     }
 }

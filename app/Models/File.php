@@ -11,7 +11,12 @@ class File extends Model
 
     protected $table = 'files';
 
-    protected $fillable = [];
+    protected $fillable = [
+        'name',
+        'hash',
+        'size',
+        'path',
+    ];
 
     public function fileable()
     {
