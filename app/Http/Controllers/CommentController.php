@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Comment\storeRequest;
+use App\Http\Requests\Comment\UpdateRequest;
+use App\Models\ApiResponse;
 use App\Models\Comment;
 use App\Models\Course;
 use App\Models\Submission;
@@ -18,11 +21,9 @@ class CommentController extends Controller
         };
     }
 
-    public function store(Request $request, $commentableType, $commentableId)
+    public function store(StoreRequest $request, $commentableType, $commentableId)
     {
-        $request->validate([
-            'content' => ["required", "string"],
-        ]);
+        $request->validated();
 
         $commentableClass = $this->getCommentableClass($commentableType);
 
@@ -35,29 +36,27 @@ class CommentController extends Controller
 
         $commentable->comments()->save($comment);
 
-        return response()->json([
-            'message' => 'Comment added successfully', 'comment' => $comment
+        return ApiResponse::success('Comment added successfully', [
+            'comment' => $comment,
+            'commentable' => $commentable,
         ]);
     }
 
-    public function update(Request $request, Comment $comment)
+    public function update(UpdateRequest $request, Comment $comment)
     {
-        $request->validate([
-            'content' => ["required", "string"],
-        ]);
+        $request->validated();
 
         $comment->update(['content' => $request->input('content')]);
 
-        return response()->json([
-            'message' => 'Comment updated successfully', 'comment' => $comment
+        return ApiResponse::success('Comment updated successfully', [
+            'comment' => $comment,
         ]);
     }
 
     public function destroy(Comment $comment)
     {
         $comment->delete();
-        return response()->json([
-            'message' => 'Comment deleted successfully'
-        ]);
+
+        return ApiResponse::success('Comment deleted successfully');
     }
 }

@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Submission\GradeSubmissionRequest;
+use App\Http\Requests\Submission\StoreRequest;
+use App\Models\ApiResponse;
 use App\Models\Enrollment;
 use App\Models\Submission;
 use App\Models\Task;
@@ -13,11 +16,9 @@ class SubmissionController extends Controller
 {
     use AuthorizesRequests;
 
-    public function store(Request $request, Task $task)
+    public function store(StoreRequest $request, Task $task)
     {
-        $request->validate([
-            'files.*' => ["nullable", "file", "mimes:pdf,docx,pptx,xlsx", "max:2048"],
-        ]);
+        $request->validated();
 
         // Check if the authenticated user is enrolled in the course
         $this->authorize('submitSubmission', $task);
@@ -52,8 +53,7 @@ class SubmissionController extends Controller
             }
         }
 
-        return response()->json([
-            'message' => 'Submission created successfully',
+        return ApiResponse::success('Submission created successfully', [
             'submission' => $submission->load('files'),
         ]);
     }
@@ -70,21 +70,17 @@ class SubmissionController extends Controller
 
         $submission->delete();
 
-        return response()->json([
-            'message' => 'Submission deleted successfully',
-        ]);
+        return ApiResponse::success('Submission deleted successfully');
     }
 
-    public function gradeSubmission(Request $request, Submission $submission)
+    public function gradeSubmission(GradeSubmissionRequest $request, Submission $submission)
     {
-        $request->validate([
-            'grade' => ["nullable", "numeric", "between:1,100"]
-        ]);
+        $request->validated();
 
         $submission->update($request->only(['grade']));
 
-        return response()->json([
-            'message' => 'Submission graded successfully'
+        return ApiResponse::success('Submission graded successfully', [
+            'submission' => $submission,
         ]);
     }
 }

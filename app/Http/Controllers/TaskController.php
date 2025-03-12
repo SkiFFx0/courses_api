@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Task\StoreRequest;
+use App\Http\Requests\Task\UpdateRequest;
+use App\Models\ApiResponse;
 use App\Models\Course;
 use App\Models\Task;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -12,35 +15,30 @@ class TaskController extends Controller
 {
     use AuthorizesRequests;
 
-    public function store(Request $request, Course $course)
+    public function store(StoreRequest $request, Course $course)
     {
-        $taskData = $request->validate([
-            'title' => ["required", "string", "max:255", "unique:tasks,title"],
-            'content' => ["required", "string", "max:255"],
-        ]);
+        $taskData = $request->validated();
 
         $taskData["course_id"] = $course->id;
 
         Task::query()->create($taskData);
 
-        return response()->json([
-            'message' => 'Task created successfully'
+        return ApiResponse::success('Task created successfully', [
+            'course' => $course,
+            'task' => $taskData,
         ]);
     }
 
-    public function update(Request $request, Task $task)
+    public function update(UpdateRequest $request, Task $task)
     {
         $this->authorize('checkOwnership', $task);
 
-        $taskData = $request->validate([
-            'title' => ["nullable", "string", "max:255", Rule::unique('tasks')->ignore($task->id)],
-            'content' => ["nullable", "string", "max:255"],
-        ]);
+        $taskData = $request->validated();
 
         $task->update($taskData);
 
-        return response()->json([
-            'message' => 'Task updated successfully'
+        return ApiResponse::success('Task updated successfully', [
+            'task' => $task,
         ]);
     }
 
@@ -50,8 +48,6 @@ class TaskController extends Controller
 
         $task->delete();
 
-        return response()->json([
-            'message' => 'Task deleted successfully'
-        ]);
+        return ApiResponse::success('Task deleted successfully');
     }
 }

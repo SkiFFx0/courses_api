@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Enrollment\GradeEnrollmentRequest;
+use App\Models\ApiResponse;
 use App\Models\Course;
 use App\Models\Enrollment;
 use App\Models\User;
@@ -14,10 +16,13 @@ class EnrollmentController extends Controller
 
     public function store(Request $request, Course $course)
     {
-        $request->user()->courses()->attach($course);
+        $student = $request->user();
 
-        return response()->json([
-            'message' => 'Enrollment created successfully'
+        $student->courses()->attach($course);
+
+        return ApiResponse::success('Enrollment created successfully', [
+            'course' => $course,
+            'student' => $student,
         ]);
     }
 
@@ -25,21 +30,17 @@ class EnrollmentController extends Controller
     {
         $request->user()->courses()->detach($course);
 
-        return response()->json([
-            'message' => 'Enrollment deleted successfully'
-        ]);
+        return ApiResponse::success('Enrollment deleted successfully');
     }
 
-    public function gradeEnrollment(Request $request, Enrollment $enrollment)
+    public function gradeEnrollment(GradeEnrollmentRequest $request, Enrollment $enrollment)
     {
-        $request->validate([
-            'grade' => ["nullable", "numeric", "between:1,100"]
-        ]);
+        $request->validated();
 
         $enrollment->update($request->only(['grade']));
 
-        return response()->json([
-            'message' => 'Enrollment graded successfully'
+        return ApiResponse::success('Enrollment graded successfully', [
+            'enrollment' => $enrollment
         ]);
     }
 
@@ -49,15 +50,14 @@ class EnrollmentController extends Controller
 
         if ($student->courses->contains($course))
         {
-            return response()->json([
-                'message' => 'Student already enrolled in this course'
-            ]);
+            return ApiResponse::error('Student already enrolled in this course');
         }
 
         $student->courses()->attach($course);
 
-        return response()->json([
-            'message' => 'Student enrollment added successfully'
+        return ApiResponse::success('Student enrollment added successfully', [
+            'course' => $course,
+            'student' => $student
         ]);
     }
 
@@ -67,8 +67,6 @@ class EnrollmentController extends Controller
 
         $student->courses()->detach($course);
 
-        return response()->json([
-            'message' => 'Student enrollment deleted successfully'
-        ]);
+        return ApiResponse::error('Student enrollment deleted successfully');
     }
 }

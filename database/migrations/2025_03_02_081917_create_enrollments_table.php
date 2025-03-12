@@ -18,7 +18,6 @@ return new class extends Migration
             $table->foreignId('course_id')->constrained('courses')->cascadeOnDelete();
             $table->foreignId('student_id')->constrained('users')->cascadeOnDelete();
             $table->unsignedSmallInteger('grade')->nullable();
-            $table->SoftDeletes();
             $table->timestamps();
             $table->unique(['course_id', 'student_id']);
         });

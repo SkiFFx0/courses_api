@@ -2,44 +2,39 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Course\StoreRequest;
+use App\Http\Requests\Course\UpdateRequest;
+use App\Models\ApiResponse;
 use App\Models\Course;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
 class CourseController extends Controller
 {
     use AuthorizesRequests;
 
-    public function store(Request $request)
+    public function store(StoreRequest $request)
     {
-        $courseData = $request->validate([
-            'title' => ["required", "string", "max:255", "unique:courses,title"],
-            'description' => ["required", "string", "max:255"],
-        ]);
+        $courseData = $request->validated();
 
         $courseData['teacher_id'] = auth()->id();
 
         Course::query()->create($courseData);
 
-        return response()->json([
-            'message' => 'Course created successfully'
+        return ApiResponse::success('Course created successfully', [
+            "course" => $courseData,
         ]);
     }
 
-    public function update(Request $request, Course $course)
+    public function update(UpdateRequest $request, Course $course)
     {
-        $this->authorize('checkOwnership', $course);
+        $courseData = $request->validated();
 
-        $courseData = $request->validate([
-            'title' => ["nullable", "string", "max:255", Rule::unique('courses')->ignore($course->id)],
-            'description' => ["nullable", "string", "max:255"],
-        ]);
+        $this->authorize('checkOwnership', $course);
 
         $course->update($courseData);
 
-        return response()->json([
-            'message' => 'Course updated successfully'
+        return ApiResponse::success('Course updated successfully', [
+            'course' => $course
         ]);
     }
 
@@ -49,8 +44,6 @@ class CourseController extends Controller
 
         $course->delete();
 
-        return response()->json([
-            'message' => 'Course deleted successfully'
-        ]);
+        return ApiResponse::success('Course deleted successfully');
     }
 }
